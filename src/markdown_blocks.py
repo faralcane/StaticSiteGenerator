@@ -3,6 +3,8 @@ from htmlnode import HTMLNode, ParentNode
 from inline_markdown import text_to_textnodes
 from textnode import text_node_to_html_node, TextNode, TextType
 import re
+from pathlib import Path
+
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -72,8 +74,6 @@ def block_to_html_node(block: str) -> ParentNode:
         return quote_to_html_node(block)
     raise ValueError("invalid block type")
 
-
-
 def text_to_children(text: str)-> list[HTMLNode]:
     text_nodes = text_to_textnodes(text)
     children = []
@@ -140,3 +140,29 @@ def quote_to_html_node(block: str) -> ParentNode:
     content = " ".join(new_lines)
     children = text_to_children(content)
     return ParentNode("blockquote", children)
+
+def extract_title(markdown: str)-> str:
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block_to_block_type(block) == BlockType.HEADING:
+            if block.startswith("# "):
+                return block[2:]
+    raise Exception("No valid h1 heading found for title")
+
+def generate_page(from_path, template_path, dest_path)-> None:
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    with open(from_path, 'r') as file:
+        markdown_content = file.read()
+
+    with open(template_path, 'r') as file:
+        template_content = file.read()
+
+    converted_html = markdown_to_html_node(markdown_content).to_html()
+    title = extract_title(markdown_content)
+
+    generated_page = template_content.replace("{{ Title }}", title).replace("{{ Content }}", converted_html)
+
+    out_path = Path(dest_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(generated_page)
