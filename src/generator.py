@@ -18,8 +18,8 @@ def generate_page(from_path, template_path, dest_path, basepath)-> None:
     title = extract_title(markdown_content)
 
     generated_page = template_content.replace("{{ Title }}", title).replace("{{ Content }}", converted_html)
-    generated_page = generated_page.replace('src="/', f'src="{basepath}')
-    generated_page = generated_page.replace('src="/', f'src="{basepath}')
+    generated_page = generated_page.replace('href="/', 'href="' + basepath)
+    generated_page = generated_page.replace('src="/', 'src="' + basepath)
 
     out_path = Path(dest_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
