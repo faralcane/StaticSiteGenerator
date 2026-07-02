@@ -1,6 +1,6 @@
 import os
 import shutil
-from markdown_blocks import generate_page
+from generator import generate_pages_recursive
 
 from copystatic import copy_files_recursive
 
@@ -21,6 +21,6 @@ def main() -> None:
     #Update main.py: after copying files from static to public, it should generate a page from content/index.md 
     # using template.html and write it to public/index.html.
 
-    generate_page("./content/index.md", "./template.html", "./public/index.html")
+    generate_pages_recursive(dir_path_content, "./template.html", dir_path_public)
 
 main()

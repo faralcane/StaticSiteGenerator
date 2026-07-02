@@ -3,7 +3,6 @@ from htmlnode import HTMLNode, ParentNode
 from inline_markdown import text_to_textnodes
 from textnode import text_node_to_html_node, TextNode, TextType
 import re
-from pathlib import Path
 
 
 class BlockType(Enum):
@@ -148,21 +147,3 @@ def extract_title(markdown: str)-> str:
             if block.startswith("# "):
                 return block[2:]
     raise Exception("No valid h1 heading found for title")
-
-def generate_page(from_path, template_path, dest_path)-> None:
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-
-    with open(from_path, 'r') as file:
-        markdown_content = file.read()
-
-    with open(template_path, 'r') as file:
-        template_content = file.read()
-
-    converted_html = markdown_to_html_node(markdown_content).to_html()
-    title = extract_title(markdown_content)
-
-    generated_page = template_content.replace("{{ Title }}", title).replace("{{ Content }}", converted_html)
-
-    out_path = Path(dest_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(generated_page)
